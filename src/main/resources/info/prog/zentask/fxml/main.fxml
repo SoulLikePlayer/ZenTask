@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" spacing="10" padding="10">
+    <Label text="Gestionnaire de Tâches" />
+    <TableView fx:id="tasksTable">
+        <columns>
+            <TableColumn text="ID" prefWidth="50">
+                <cellValueFactory>
+                    <PropertyValueFactory property="id" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Titre" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="title" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Description" prefWidth="300">
+                <cellValueFactory>
+                    <PropertyValueFactory property="description" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Priorité" prefWidth="100">
+                <cellValueFactory>
+                    <PropertyValueFactory property="priority" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Date limite" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="deadline" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Statut" prefWidth="100">
+                <cellValueFactory>
+                    <PropertyValueFactory property="status" />
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+</VBox>
