@@ -19,17 +19,11 @@ public class MainController {
     private TableView<Tache> tasksTable;
 
     public void initialize() {
-        initializeDatabase();
         loadTasks();
     }
 
-    private void initializeDatabase() {
-        // Vous pouvez ajouter ici le code pour initialiser la connexion à la base de données si nécessaire
-        // Assurez-vous que votre gestionnaire de base de données est configuré correctement
-    }
-
     private void loadTasks() {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/database/gestionnaire.db");
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db");
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM tasks")) {
 

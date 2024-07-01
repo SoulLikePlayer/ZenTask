@@ -12,7 +12,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/info/prog/zentask/fxml/main.fxml"));
         primaryStage.setTitle("Gestionnaire de Tâches");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
