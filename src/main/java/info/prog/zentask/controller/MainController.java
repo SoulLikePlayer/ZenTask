@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 
 import java.sql.*;
 
@@ -24,7 +23,7 @@ public class MainController {
     @FXML
     private TableColumn<Tache, String> statusColumn;
     @FXML
-    private TableColumn<Tache, Integer> projectIdColumn;
+    private TableColumn<Tache, String> projectNameColumn;
 
     @FXML
     private TextField titleField;
@@ -55,7 +54,7 @@ public class MainController {
         priorityColumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
         deadlineColumn.setCellValueFactory(new PropertyValueFactory<>("deadline"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        projectIdColumn.setCellValueFactory(new PropertyValueFactory<>("projectId"));
+        projectNameColumn.setCellValueFactory(new PropertyValueFactory<>("projectName"));
 
         loadTasks(); // Charger les tâches depuis la base de données
         loadProjects(); // Charger les projets depuis la base de données
@@ -71,16 +70,16 @@ public class MainController {
             completeButton.setDisable(!selected);
         });
 
+        // Appliquer un style différent aux lignes selon le statut de la tâche
         tasksTable.setRowFactory(tv -> new TableRow<Tache>() {
             @Override
             protected void updateItem(Tache tache, boolean empty) {
                 super.updateItem(tache, empty);
-
                 if (tache == null || empty) {
                     setStyle("");
                 } else {
                     if ("Terminé".equals(tache.getStatus())) {
-                        setStyle("-fx-background-color: #c8e6c9;");
+                        setStyle("-fx-background-color: #c8e6c9;"); // Fond vert clair
                     } else {
                         setStyle("");
                     }
@@ -116,9 +115,9 @@ public class MainController {
         String priorityText = priorityField.getText().trim();
         String deadline = deadlinePicker.getValue().toString();
         String status = "En Cours";
-        Integer projectId = projectComboBox.getSelectionModel().getSelectedIndex() + 1;
+        String projectName = projectComboBox.getValue();
 
-        if (title.isEmpty() || priorityText.isEmpty() || deadline.isEmpty()) {
+        if (title.isEmpty() || priorityText.isEmpty() || deadline.isEmpty() || projectName == null) {
             showAlert("Erreur", "Champs vides", "Veuillez remplir tous les champs.");
             return;
         }
@@ -131,16 +130,37 @@ public class MainController {
             return;
         }
 
+        int projectId = getProjectIdByName(projectName);
+        Tache newTache = new Tache(0, title, description, priority, deadline, status, projectId, projectName);
+        boolean addReussie = addTacheToDatabase(newTache);
 
-        Tache newTache = new Tache(0, title, description, priority, deadline, status, projectId);
-        boolean addRéussie = addTacheToDatabase(newTache);
-        if (addRéussie){
+        if (addReussie) {
             showAlert("Succès", "Tâche ajoutée", "La tâche a été ajoutée avec succès.");
             clearFields();
             loadTasks();
         } else {
             showAlert("Erreur", "Échec de l'ajout", "Une erreur s'est produite lors de l'ajout de la tâche.");
         }
+    }
+
+    private int getProjectIdByName(String projectName) {
+        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
+        String sql = "SELECT id FROM projects WHERE name = ?";
+        int projectId = 0;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, projectName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                projectId = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors de la récupération de l'ID du projet : " + e.getMessage());
+        }
+
+        return projectId;
     }
 
     @FXML
@@ -179,7 +199,7 @@ public class MainController {
     private void loadTasks() {
         tacheList.clear();
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "SELECT * FROM tasks";
+        String sql = "SELECT t.*, p.name AS projectName FROM tasks t LEFT JOIN projects p ON t.projectId = p.id";
 
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement();
@@ -192,9 +212,9 @@ public class MainController {
                 int priority = rs.getInt("priority");
                 String deadline = rs.getString("deadline");
                 String status = rs.getString("status");
-                int projectId = rs.getInt("projectId");
+                String projectName = rs.getString("projectName");
 
-                Tache tache = new Tache(id, title, description, priority, deadline, status, projectId);
+                Tache tache = new Tache(id, title, description, priority, deadline, status, 0, projectName);
                 tacheList.add(tache);
             }
         } catch (SQLException e) {

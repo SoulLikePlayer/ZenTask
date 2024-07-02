@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.ComboBox?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="info.prog.zentask.controller.MainController">
-
-    <!-- Tableau des tâches -->
-    <TableView fx:id="tasksTable">
-        <columns>
-            <TableColumn fx:id="titleColumn" text="Titre"/>
-            <TableColumn fx:id="descriptionColumn" text="Description"/>
-            <TableColumn fx:id="priorityColumn" text="Priorité"/>
-            <TableColumn fx:id="deadlineColumn" text="Échéance"/>
-            <TableColumn fx:id="statusColumn" text="Statut"/>
-            <TableColumn fx:id="projectIdColumn" text="ID du Projet"/>
-        </columns>
-    </TableView>
-
-    <!-- Formulaire de création de tâche -->
-    <HBox>
-        <TextField fx:id="titleField" promptText="Titre"/>
-        <TextField fx:id="descriptionField" promptText="Description"/>
-        <TextField fx:id="priorityField" promptText="Priorité"/>
-        <DatePicker fx:id="deadlinePicker" promptText="Échéance"/>
-        <ComboBox fx:id="projectComboBox" promptText="Choisir un Projet"/>
-        <Button fx:id="addButton" text="Ajouter Tâche" onAction="#handleAjouterTache"/>
-    </HBox>
-
-    <!-- Boutons "Terminer" et "Supprimer" -->
-    <HBox alignment="CENTER_RIGHT">
-        <Button fx:id="completeButton" text="Terminer Tâche" disable="true" onAction="#handleTerminerTache"/>
-        <Button fx:id="deleteButton" text="Supprimer Tâche" disable="true" onAction="#handleSupprimerTache"/>
-    </HBox>
-
-    <!-- Bouton pour ajouter un projet -->
-    <Button text="Ajouter Projet" onAction="#handleAjouterProjet"/>
-</VBox>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="800.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="info.prog.zentask.controller.MainController">
+    <children>
+        <VBox layoutX="20.0" layoutY="20.0" prefHeight="760.0" prefWidth="960.0" spacing="10.0">
+            <children>
+                <HBox spacing="10.0">
+                    <children>
+                        <TextField fx:id="titleField" promptText="Titre" />
+                        <TextField fx:id="descriptionField" promptText="Description" />
+                        <TextField fx:id="priorityField" promptText="Priorité" />
+                        <DatePicker fx:id="deadlinePicker" promptText="Date limite" />
+                        <ComboBox fx:id="projectComboBox" promptText="Sélectionner projet" />
+                        <Button fx:id="addButton" mnemonicParsing="false" onAction="#handleAjouterTache" text="Ajouter" />
+                    </children>
+                </HBox>
+                <TableView fx:id="tasksTable" prefHeight="600.0" prefWidth="960.0">
+                    <columns>
+                        <TableColumn fx:id="titleColumn" prefWidth="150.0" text="Titre" />
+                        <TableColumn fx:id="descriptionColumn" prefWidth="200.0" text="Description" />
+                        <TableColumn fx:id="priorityColumn" prefWidth="75.0" text="Priorité" />
+                        <TableColumn fx:id="deadlineColumn" prefWidth="150.0" text="Date Limite" />
+                        <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Statut" />
+                        <TableColumn fx:id="projectNameColumn" prefWidth="150.0" text="Nom Projet" />
+                    </columns>
+                </TableView>
+                <HBox spacing="10.0">
+                    <children>
+                        <Button fx:id="completeButton" disable="true" mnemonicParsing="false" onAction="#handleTerminerTache" text="Terminer" />
+                        <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#handleSupprimerTache" text="Supprimer" />
+                        <Button mnemonicParsing="false" onAction="#handleAjouterProjet" text="Ajouter Projet" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
