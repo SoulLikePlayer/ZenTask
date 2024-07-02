@@ -8,6 +8,7 @@ public class Tache {
     private String deadline;
     private String status;
     private Integer projectId; // Peut être null
+    private boolean completed;
 
     public Tache(int id, String title, String description, int priority, String deadline, String status, Integer projectId) {
         this.id = id;
@@ -17,6 +18,7 @@ public class Tache {
         this.deadline = deadline;
         this.status = status;
         this.projectId = projectId;
+        this.completed = false;
     }
 
     // Getters et setters
@@ -74,5 +76,13 @@ public class Tache {
 
     public void setProjectId(Integer projectId) {
         this.projectId = projectId;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

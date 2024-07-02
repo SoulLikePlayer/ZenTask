@@ -70,6 +70,23 @@ public class MainController {
             deleteButton.setDisable(!selected);
             completeButton.setDisable(!selected);
         });
+
+        tasksTable.setRowFactory(tv -> new TableRow<Tache>() {
+            @Override
+            protected void updateItem(Tache tache, boolean empty) {
+                super.updateItem(tache, empty);
+
+                if (tache == null || empty) {
+                    setStyle("");
+                } else {
+                    if ("Terminé".equals(tache.getStatus())) {
+                        setStyle("-fx-background-color: #c8e6c9;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
     }
 
     private void loadProjects() {
@@ -96,7 +113,8 @@ public class MainController {
     private void handleAjouterTache() {
         String title = titleField.getText();
         String description = descriptionField.getText();
-        String priorityText = priorityField.getText().trim();        String deadline = deadlinePicker.getValue().toString();
+        String priorityText = priorityField.getText().trim();
+        String deadline = deadlinePicker.getValue().toString();
         String status = "En Cours";
         Integer projectId = projectComboBox.getSelectionModel().getSelectedIndex() + 1;
 
