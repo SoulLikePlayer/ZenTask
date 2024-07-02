@@ -3,7 +3,9 @@ module ZenTask {
     requires javafx.fxml;
     requires java.sql;
 
-    opens info.prog.zentask.controller to javafx.fxml; // Ouvre le package controller pour javafx.fxml
+    opens info.prog.zentask.controller to javafx.fxml;
+    opens info.prog.zentask.model to javafx.base;
+    opens info.prog.zentask to javafx.graphics, javafx.fxml;
 
-    exports info.prog.zentask; // Vous pouvez également exporter le package principal si nécessaire
+    exports info.prog.zentask;
 }

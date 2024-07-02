@@ -3,12 +3,16 @@ package info.prog.zentask.controller;
 import info.prog.zentask.model.Tache;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -54,17 +58,41 @@ public class MainController {
     private Button addButton;
 
     @FXML
+    private Button deleteButton;
+
+    @FXML
+    private Button finishButton;
+
+    private ObservableList<Tache> tacheList = FXCollections.observableArrayList();
+
+    @FXML
     private void initialize() {
         initializeTableColumns();
+        configureButtons();
         loadTasks();
     }
 
     private void initializeTableColumns() {
-        titleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitle()));
-        descriptionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
-        priorityColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPriority()).asObject());
-        deadlineColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDeadline()));
-        statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        priorityColumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
+        deadlineColumn.setCellValueFactory(new PropertyValueFactory<>("deadline"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+    }
+
+    private void configureButtons() {
+        deleteButton.setDisable(true);
+        finishButton.setDisable(true);
+
+        tasksTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                deleteButton.setDisable(false);
+                finishButton.setDisable(false);
+            } else {
+                deleteButton.setDisable(true);
+                finishButton.setDisable(true);
+            }
+        });
     }
 
     @FXML
@@ -99,6 +127,42 @@ public class MainController {
         }
     }
 
+    @FXML
+    private void handleSupprimerTache() {
+        Tache selectedTache = tasksTable.getSelectionModel().getSelectedItem();
+        if (selectedTache == null) {
+            showAlert("Erreur", "Aucune tâche sélectionnée", "Veuillez sélectionner une tâche à supprimer.");
+            return;
+        }
+
+        boolean suppressionReussie = supprimerTache(selectedTache.getId());
+
+        if (suppressionReussie) {
+            showAlert("Succès", "Tâche supprimée", "La tâche a été supprimée avec succès.");
+            loadTasks();
+        } else {
+            showAlert("Erreur", "Échec de la suppression", "Une erreur s'est produite lors de la suppression de la tâche.");
+        }
+    }
+
+    @FXML
+    private void handleTerminerTache() {
+        Tache selectedTache = tasksTable.getSelectionModel().getSelectedItem();
+        if (selectedTache == null) {
+            showAlert("Erreur", "Aucune tâche sélectionnée", "Veuillez sélectionner une tâche à marquer comme terminée.");
+            return;
+        }
+
+        boolean miseAJourReussie = mettreAJourStatutTache(selectedTache.getId(), "Terminée");
+
+        if (miseAJourReussie) {
+            showAlert("Succès", "Tâche terminée", "La tâche a été marquée comme terminée avec succès.");
+            loadTasks();
+        } else {
+            showAlert("Erreur", "Échec de la mise à jour", "Une erreur s'est produite lors de la mise à jour de la tâche.");
+        }
+    }
+
     private boolean ajouterTache(Tache tache) {
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "INSERT INTO tasks(title, description, priority, deadline, status) VALUES (?, ?, ?, ?, ?)";
@@ -110,6 +174,37 @@ public class MainController {
             pstmt.setInt(3, tache.getPriority());
             pstmt.setString(4, tache.getDeadline());
             pstmt.setString(5, tache.getStatus());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean supprimerTache(int id) {
+        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
+        String sql = "DELETE FROM tasks WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean mettreAJourStatutTache(int id, String nouveauStatut) {
+        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
+        String sql = "UPDATE tasks SET status = ? WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nouveauStatut);
+            pstmt.setInt(2, id);
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {

@@ -4,9 +4,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.HBox?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="info.prog.zentask.controller.MainController">
@@ -26,7 +26,9 @@
         <TextField fx:id="descriptionField" promptText="Description"/>
         <TextField fx:id="priorityField" promptText="Priorité"/>
         <TextField fx:id="deadlineField" promptText="Échéance"/>
-        <Button text="Ajouter" onAction="#handleAjouterTache"/>
+        <Button fx:id="addButton" text="Ajouter" onAction="#handleAjouterTache"/>
+        <Button fx:id="deleteButton" text="Supprimer" onAction="#handleSupprimerTache" disable="true"/>
+        <Button fx:id="finishButton" text="Terminer" onAction="#handleTerminerTache" disable="true"/>
     </HBox>
 
 </VBox>
