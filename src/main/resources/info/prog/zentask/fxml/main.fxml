@@ -1,45 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="info.prog.zentask.controller.MainController">
-    <Label text="Gestionnaire de Tâches" />
-    <TableView fx:id="tasksTable">
+<?import javafx.scene.layout.HBox?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="info.prog.zentask.controller.MainController">
+
+    <TableView fx:id="tasksTable" prefHeight="400.0" prefWidth="600.0">
         <columns>
-            <TableColumn text="ID" prefWidth="50">
-                <cellValueFactory>
-                    <PropertyValueFactory property="id" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Titre" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="title" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Description" prefWidth="300">
-                <cellValueFactory>
-                    <PropertyValueFactory property="description" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Priorité" prefWidth="100">
-                <cellValueFactory>
-                    <PropertyValueFactory property="priority" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Date limite" prefWidth="150">
-                <cellValueFactory>
-                    <PropertyValueFactory property="deadline" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Statut" prefWidth="100">
-                <cellValueFactory>
-                    <PropertyValueFactory property="status" />
-                </cellValueFactory>
-            </TableColumn>
+            <TableColumn fx:id="titleColumn" text="Titre" prefWidth="150.0"/>
+            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250.0"/>
+            <TableColumn fx:id="priorityColumn" text="Priorité" prefWidth="50.0"/>
+            <TableColumn fx:id="deadlineColumn" text="Échéance" prefWidth="100.0"/>
+            <TableColumn fx:id="statusColumn" text="Statut" prefWidth="100.0"/>
         </columns>
     </TableView>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <TextField fx:id="titleField" promptText="Titre"/>
+        <TextField fx:id="descriptionField" promptText="Description"/>
+        <TextField fx:id="priorityField" promptText="Priorité"/>
+        <TextField fx:id="deadlineField" promptText="Échéance"/>
+        <Button text="Ajouter" onAction="#handleAjouterTache"/>
+    </HBox>
+
 </VBox>
