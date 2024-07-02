@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -9,7 +10,8 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="info.prog.zentask.controller.MainController">
+      fx:controller="info.prog.zentask.controller.MainController"
+>
 
     <TableView fx:id="tasksTable" prefHeight="400.0" prefWidth="600.0">
         <columns>
@@ -25,7 +27,7 @@
         <TextField fx:id="titleField" promptText="Titre"/>
         <TextField fx:id="descriptionField" promptText="Description"/>
         <TextField fx:id="priorityField" promptText="Priorité"/>
-        <TextField fx:id="deadlineField" promptText="Échéance"/>
+        <DatePicker fx:id="deadlinePicker" promptText="Échéance"/>
         <Button fx:id="addButton" text="Ajouter" onAction="#handleAjouterTache"/>
         <Button fx:id="deleteButton" text="Supprimer" onAction="#handleSupprimerTache" disable="true"/>
         <Button fx:id="finishButton" text="Terminer" onAction="#handleTerminerTache" disable="true"/>

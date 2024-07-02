@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -19,6 +20,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class MainController {
     private TextField priorityField;
 
     @FXML
-    private TextField deadlineField;
+    private DatePicker deadlinePicker;
 
     @FXML
     private TableView<Tache> tasksTable;
@@ -100,9 +102,9 @@ public class MainController {
         String title = titleField.getText().trim();
         String description = descriptionField.getText().trim();
         String priorityText = priorityField.getText().trim();
-        String deadline = deadlineField.getText().trim();
+        LocalDate deadline = deadlinePicker.getValue();
 
-        if (title.isEmpty() || priorityText.isEmpty() || deadline.isEmpty()) {
+        if (title.isEmpty() || priorityText.isEmpty() || deadline == null) {
             showAlert("Erreur", "Champs vides", "Veuillez remplir tous les champs.");
             return;
         }
@@ -115,7 +117,7 @@ public class MainController {
             return;
         }
 
-        Tache nouvelleTache = new Tache(0, title, description, priority, deadline, "À faire");
+        Tache nouvelleTache = new Tache(0, title, description, priority, deadline.toString(), "À faire");
         boolean ajoutReussi = ajouterTache(nouvelleTache);
 
         if (ajoutReussi) {
@@ -214,16 +216,14 @@ public class MainController {
     }
 
     private void loadTasks() {
-        tasksTable.getItems().clear();
-
+        tacheList.clear();
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "SELECT * FROM tasks";
 
         try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
 
-            List<Tache> taches = new ArrayList<>();
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String title = rs.getString("title");
@@ -231,20 +231,20 @@ public class MainController {
                 int priority = rs.getInt("priority");
                 String deadline = rs.getString("deadline");
                 String status = rs.getString("status");
-                taches.add(new Tache(id, title, description, priority, deadline, status));
+                tacheList.add(new Tache(id, title, description, priority, deadline, status));
             }
-            tasksTable.getItems().addAll(taches);
-
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+
+        tasksTable.setItems(tacheList);
     }
 
-    private void showAlert(String title, String headerText, String contentText) {
+    private void showAlert(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 
@@ -252,6 +252,6 @@ public class MainController {
         titleField.clear();
         descriptionField.clear();
         priorityField.clear();
-        deadlineField.clear();
+        deadlinePicker.getEditor().clear();
     }
 }

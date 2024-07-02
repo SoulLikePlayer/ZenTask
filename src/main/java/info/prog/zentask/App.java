@@ -13,6 +13,10 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/info/prog/zentask/fxml/main.fxml"));
+
+        String css = getClass().getResource("/info/prog/zentask/css/style.css").toExternalForm();
+        root.getStylesheets().add(css);
+
         primaryStage.setTitle("Gestionnaire de Tâches");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

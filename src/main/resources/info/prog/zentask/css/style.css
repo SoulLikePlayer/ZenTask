@@ -1,0 +1,74 @@
+/* style.css */
+
+.root {
+    -fx-font-family: "Arial", sans-serif;
+    -fx-background-color: #f0f0f0;
+}
+
+/* TableView */
+.table-view {
+    -fx-background-color: #ffffff;
+}
+
+.table-row-cell {
+    -fx-text-fill: #333333;
+}
+
+.table-column {
+    -fx-alignment: CENTER;
+    -fx-font-weight: bold;
+}
+
+/* Form fields */
+.text-field, .date-picker {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-padding: 5px;
+}
+
+.date-picker .arrow-button {
+    -fx-background-color: transparent;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #4CAF50; /* Green */
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+.button:hover {
+    -fx-background-color: #45a049; /* Darker Green */
+}
+
+.button:disabled {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #666666;
+}
+
+/* Alerts */
+.dialog-pane .alert {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+}
+
+.dialog-pane .alert .header-panel {
+    -fx-background-color: #4CAF50; /* Green */
+    -fx-text-fill: white;
+}
+
+.dialog-pane .alert .content-panel {
+    -fx-padding: 10px;
+}
+
+.dialog-pane .alert .button-bar {
+    -fx-padding: 10px;
+    -fx-alignment: CENTER_RIGHT;
+}
