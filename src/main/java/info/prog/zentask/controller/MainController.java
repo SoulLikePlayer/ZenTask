@@ -9,6 +9,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.*;
 
+/**
+ * Le controller MainController permet l'utilisation d'une base de données local pour afficher les différente tâche et projet
+ *
+ * @author LOUS Lazare
+ * @version 1.0
+ */
 public class MainController {
     @FXML
     private TableView<Tache> tasksTable;
@@ -46,6 +52,11 @@ public class MainController {
     private ObservableList<Tache> tacheList = FXCollections.observableArrayList();
     private ObservableList<String> projectList = FXCollections.observableArrayList();
 
+    /**
+     * Initialise le tableau de visualisation des tâche
+     *
+     * @see #initialize()
+     */
     @FXML
     public void initialize() {
         // Initialisation des colonnes du TableView
@@ -88,6 +99,11 @@ public class MainController {
         });
     }
 
+    /**
+     * Charge la base de donné local 'gestionnaire'
+     *
+     * @see #loadProjects()
+     */
     private void loadProjects() {
         projectList.clear();
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
@@ -107,6 +123,12 @@ public class MainController {
 
         projectComboBox.setItems(projectList);
     }
+
+    /**
+     * Permet d'ajouter une tâche au tableau
+     *
+     * @see #handleAjouterTache()
+     */
 
     @FXML
     private void handleAjouterTache() {
@@ -143,6 +165,14 @@ public class MainController {
         }
     }
 
+    /**
+     * Permet d'obtenir le numéro du projet par le nom de se projet
+     *
+     * @param projectName
+     * @return le numéro (ID) du projet
+     * @see #getProjectIdByName(String)
+     */
+
     private int getProjectIdByName(String projectName) {
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "SELECT id FROM projects WHERE name = ?";
@@ -163,6 +193,12 @@ public class MainController {
         return projectId;
     }
 
+    /**
+     * Permet d'ajouter un projet a la base de donnée
+     *
+     * @see #handleAjouterTache()
+     */
+
     @FXML
     private void handleAjouterProjet() {
         String newProjectName = showInputDialog("Nouveau Projet", "Nom du nouveau projet :");
@@ -177,6 +213,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Permet de terminer une tâche
+     *
+     * @see #handleTerminerTache()
+     */
+
     @FXML
     private void handleTerminerTache() {
         Tache selectedTache = tasksTable.getSelectionModel().getSelectedItem();
@@ -187,6 +229,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Permet de supprimer une tâche
+     *
+     * @see #handleSupprimerTache()
+     */
+
     @FXML
     private void handleSupprimerTache() {
         Tache selectedTache = tasksTable.getSelectionModel().getSelectedItem();
@@ -195,6 +243,11 @@ public class MainController {
             loadTasks();
         }
     }
+
+    /**
+     * Permet de charger les tâches présentes dans la base de données et de les convertir en objet de classe Tâche
+     *
+     */
 
     private void loadTasks() {
         tacheList.clear();
@@ -224,6 +277,13 @@ public class MainController {
         tasksTable.setItems(tacheList);
     }
 
+    /**
+     * effectue le 'ADD' d'une tâche
+     *
+     * @param tache
+     * @return True = ajout bien effectué | False = ajout mal effectué
+     * @see #addTacheToDatabase(Tache)
+     */
     private boolean addTacheToDatabase(Tache tache) {
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "INSERT INTO tasks(title, description, priority, deadline, status, projectId) " +
@@ -245,6 +305,13 @@ public class MainController {
         }
     }
 
+    /**
+     * Permet d'ajouter un nouveaux projet dans la base de données
+     *
+     * @param projectName
+     * @param projectDescription
+     * @return
+     */
     private boolean addProjectToDatabase(String projectName, String projectDescription) {
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "INSERT INTO projects(name, description) VALUES(?, ?)";
@@ -261,6 +328,11 @@ public class MainController {
         }
     }
 
+    /**
+     * permet de mettre à jour l'état de la tâche
+     *
+     * @param tache
+     */
     private void updateTacheStatus(Tache tache) {
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "UPDATE tasks SET status = ? WHERE id = ?";
@@ -275,6 +347,11 @@ public class MainController {
         }
     }
 
+    /**
+     * Effectue le 'DELETE' d'une tâche dans la base de données
+     *
+     * @param tache
+     */
     private void deleteTacheFromDatabase(Tache tache) {
         String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
         String sql = "DELETE FROM tasks WHERE id = ?";

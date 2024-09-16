@@ -1,5 +1,10 @@
 package info.prog.zentask.model;
 
+/**
+ *La Classe Tache représente une tache avec un id unique, une description, une priorité, une 'deadline', un état
+ *@author LOUIS Lazare
+ * @version 1.0
+ **/
 public class Tache {
     private int id;
     private String title;
@@ -10,6 +15,18 @@ public class Tache {
     private Integer projectId;
     private String projectName;
 
+    /**
+     * Constructeur qui crée une nouvelle tâche
+     *
+     * @param id
+     * @param title
+     * @param description
+     * @param priority
+     * @param deadline
+     * @param status
+     * @param projectId
+     * @param projectName
+     */
     public Tache(int id, String title, String description, int priority, String deadline, String status, Integer projectId, String projectName) {
         this.id = id;
         this.title = title;
@@ -20,6 +37,7 @@ public class Tache {
         this.projectId = projectId;
         this.projectName = projectName;
     }
+
 
     public int getId() {
         return id;
