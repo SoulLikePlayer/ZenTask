@@ -8,4 +8,5 @@ module ZenTask {
     opens info.prog.zentask to javafx.graphics, javafx.fxml;
 
     exports info.prog.zentask;
+    exports info.prog.zentask.model;
 }

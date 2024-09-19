@@ -1,45 +1,43 @@
 package info.prog.zentask.model;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- *La Classe Tache représente une tache avec un id unique, une description, une priorité, une 'deadline', un état
- *@author LOUIS Lazare
- * @version 1.0
- **/
+ * La classe Tache représente une tâche avec un id unique, un titre, une description, une priorité, une 'deadline',
+ * un statut, et elle est liée à un projet spécifique.
+ */
 public class Tache {
-    private int id;
-    private String title;
-    private String description;
-    private int priority;
-    private String deadline;
-    private String status;
-    private Integer projectId;
-    private String projectName;
+    private static final AtomicInteger idCounter = new AtomicInteger(1); // Compteur pour générer les ids automatiquement
+    private Integer id; // Id généré automatiquement
+    private String title; // Obligatoire
+    private String description; // Obligatoire
+    private Integer priority; // Peut être null
+    private String deadline; // Peut être null
+    private Status status; // Obligatoire
+    private Projet project; // Lien avec un projet (obligatoire)
 
     /**
-     * Constructeur qui crée une nouvelle tâche
-     *
-     * @param id
-     * @param title
-     * @param description
-     * @param priority
-     * @param deadline
-     * @param status
-     * @param projectId
-     * @param projectName
+     * Constructeur pour créer une tâche.
+     * @param title Le titre de la tâche (obligatoire).
+     * @param description La description de la tâche (obligatoire).
+     * @param priority La priorité de la tâche (peut être null).
+     * @param deadline La deadline de la tâche (peut être null).
+     * @param status Le statut de la tâche (obligatoire).
+     * @param project Le projet auquel la tâche est associée (obligatoire).
      */
-    public Tache(int id, String title, String description, int priority, String deadline, String status, Integer projectId, String projectName) {
+    public Tache(int id, String title, String description, Integer priority, String deadline, Status status, Projet project) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.deadline = deadline;
         this.status = status;
-        this.projectId = projectId;
-        this.projectName = projectName;
+        this.project = project;
     }
 
+    // Getters et setters
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -47,59 +45,47 @@ public class Tache {
         return title;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public String getDeadline() {
-        return deadline;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Integer getProjectId() {
-        return projectId;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setPriority(int priority) {
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public String getDeadline() {
+        return deadline;
     }
 
     public void setDeadline(String deadline) {
         this.deadline = deadline;
     }
 
-    public void setStatus(String status) {
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
         this.status = status;
     }
 
-    public void setProjectId(Integer projectId) {
-        this.projectId = projectId;
+    public Projet getProject() {
+        return project;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
+    public void setProject(Projet project) {
+        this.project = project;
     }
 }
