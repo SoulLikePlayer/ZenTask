@@ -3,30 +3,34 @@ package info.prog.zentask.model;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * La classe Tache représente une tâche avec un id unique, un titre, une description, une priorité, une 'deadline',
- * un statut, et elle est liée à un projet spécifique.
+ * La classe Tache représente une tâche à accomplir dans le cadre d'un projet.
+ * Chaque tâche a un id unique, un titre, une description, une priorité optionnelle,
+ * une date limite (deadline) optionnelle, un statut, et est associée à un projet.
+ *
+ * Cette classe utilise un compteur atomique pour générer des ids uniques automatiquement.
  */
 public class Tache {
-    private static final AtomicInteger idCounter = new AtomicInteger(1); // Compteur pour générer les ids automatiquement
-    private Integer id; // Id généré automatiquement
-    private String title; // Obligatoire
-    private String description; // Obligatoire
-    private Integer priority; // Peut être null
-    private String deadline; // Peut être null
-    private Status status; // Obligatoire
-    private Projet project; // Lien avec un projet (obligatoire)
+    private static final AtomicInteger idCounter = new AtomicInteger(1); // Génération automatique des ids
+    private Integer id; // Id unique de la tâche
+    private String title; // Titre de la tâche (obligatoire)
+    private String description; // Description de la tâche (obligatoire)
+    private Integer priority; // Priorité de la tâche (peut être null)
+    private String deadline; // Deadline de la tâche (peut être null)
+    private Status status; // Statut de la tâche (obligatoire)
+    private Projet project; // Projet associé à la tâche (obligatoire)
 
     /**
-     * Constructeur pour créer une tâche.
+     * Constructeur pour créer une nouvelle tâche.
+     *
      * @param title Le titre de la tâche (obligatoire).
      * @param description La description de la tâche (obligatoire).
      * @param priority La priorité de la tâche (peut être null).
-     * @param deadline La deadline de la tâche (peut être null).
+     * @param deadline La date limite de la tâche (peut être null).
      * @param status Le statut de la tâche (obligatoire).
-     * @param project Le projet auquel la tâche est associée (obligatoire).
+     * @param project Le projet auquel cette tâche est associée (obligatoire).
      */
-    public Tache(int id, String title, String description, Integer priority, String deadline, Status status, Projet project) {
-        this.id = id;
+    public Tache(String title, String description, Integer priority, String deadline, Status status, Projet project) {
+        this.id = idCounter.getAndIncrement();
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -35,7 +39,7 @@ public class Tache {
         this.project = project;
     }
 
-    // Getters et setters
+    // Getters et Setters pour accéder et modifier les attributs de la tâche
 
     public Integer getId() {
         return id;
