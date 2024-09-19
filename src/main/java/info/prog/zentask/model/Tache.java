@@ -1,16 +1,6 @@
 package info.prog.zentask.model;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-/**
- * La classe Tache représente une tâche à accomplir dans le cadre d'un projet.
- * Chaque tâche a un id unique, un titre, une description, une priorité optionnelle,
- * une date limite (deadline) optionnelle, un statut, et est associée à un projet.
- *
- * Cette classe utilise un compteur atomique pour générer des ids uniques automatiquement.
- */
 public class Tache {
-    private static final AtomicInteger idCounter = new AtomicInteger(1); // Génération automatique des ids
     private Integer id; // Id unique de la tâche
     private String title; // Titre de la tâche (obligatoire)
     private String description; // Description de la tâche (obligatoire)
@@ -20,7 +10,7 @@ public class Tache {
     private Projet project; // Projet associé à la tâche (obligatoire)
 
     /**
-     * Constructeur pour créer une nouvelle tâche.
+     * Constructeur pour créer une nouvelle tâche sans spécifier l'id.
      *
      * @param title Le titre de la tâche (obligatoire).
      * @param description La description de la tâche (obligatoire).
@@ -30,7 +20,22 @@ public class Tache {
      * @param project Le projet auquel cette tâche est associée (obligatoire).
      */
     public Tache(String title, String description, Integer priority, String deadline, Status status, Projet project) {
-        this.id = idCounter.getAndIncrement();
+        this(null, title, description, priority, deadline, status, project);
+    }
+
+    /**
+     * Constructeur pour créer une nouvelle tâche en spécifiant l'id.
+     *
+     * @param id L'identifiant de la tâche.
+     * @param title Le titre de la tâche (obligatoire).
+     * @param description La description de la tâche (obligatoire).
+     * @param priority La priorité de la tâche (peut être null).
+     * @param deadline La date limite de la tâche (peut être null).
+     * @param status Le statut de la tâche (obligatoire).
+     * @param project Le projet auquel cette tâche est associée (obligatoire).
+     */
+    public Tache(Integer id, String title, String description, Integer priority, String deadline, Status status, Projet project) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -43,6 +48,10 @@ public class Tache {
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getTitle() {

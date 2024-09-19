@@ -25,8 +25,8 @@ public class TacheProjetTest {
         projet = new Projet("Projet Test", "Description du projet test");
 
         // Créer deux tâches pour les tests
-        tache1 = new Tache(1, "Tâche 1", "Description Tâche 1", 1, "2023-09-30", Status.EN_COURS, projet);
-        tache2 = new Tache(2, "Tâche 2", "Description Tâche 2", 2, null, Status.TERMINÉ, projet);
+        tache1 = new Tache("Tâche 1", "Description Tâche 1", 1, "2023-09-30", Status.EN_COURS, projet);
+        tache2 = new Tache("Tâche 2", "Description Tâche 2", 2, null, Status.TERMINÉ, projet);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TacheProjetTest {
     @Test
     public void testCreationTacheAvecPrioritéNull() {
         // Créer une tâche sans priorité
-        Tache tacheSansPriorite = new Tache(1, "Tâche 3", "Description Tâche 3", null, null, Status.ANNULÉ, projet);
+        Tache tacheSansPriorite = new Tache( "Tâche 3", "Description Tâche 3", null, null, Status.ANNULÉ, projet);
 
         assertThat(tacheSansPriorite.getPriority()).isNull();
     }
@@ -113,7 +113,7 @@ public class TacheProjetTest {
     public void testGenerationIdUniquePourLesTachesEtProjets() {
         // Vérifier que chaque projet et chaque tâche a un id unique
         Projet projet2 = new Projet("Deuxième projet", "Description projet 2");
-        Tache tache3 = new Tache(0, "Tâche 3", "Description Tâche 3", null, null, Status.ANNULÉ, projet2);
+        Tache tache3 = new Tache( "Tâche 3", "Description Tâche 3", null, null, Status.ANNULÉ, projet2);
 
         assertThat(projet2.getId()).isNotEqualTo(projet.getId());
         assertThat(tache3.getId()).isNotEqualTo(tache1.getId());
