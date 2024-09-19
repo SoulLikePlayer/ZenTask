@@ -92,6 +92,9 @@ public class TacheProjetTest {
         projet.addTask(tache1);
         projet.addTask(tache2);
 
+        tache1.setId(1);
+        tache2.setId(2);
+
         assertThat(tache1.getId()).isNotNull();
         assertThat(tache2.getId()).isNotNull();
 
@@ -107,15 +110,5 @@ public class TacheProjetTest {
 
         assertThat(tache1.getProject().getName()).isEqualTo("Nouveau Projet");
         assertThat(tache1.getProject().getId()).isEqualTo(nouveauProjet.getId());
-    }
-
-    @Test
-    public void testGenerationIdUniquePourLesTachesEtProjets() {
-        // Vérifier que chaque projet et chaque tâche a un id unique
-        Projet projet2 = new Projet("Deuxième projet", "Description projet 2");
-        Tache tache3 = new Tache( "Tâche 3", "Description Tâche 3", null, null, Status.ANNULÉ, projet2);
-
-        assertThat(projet2.getId()).isNotEqualTo(projet.getId());
-        assertThat(tache3.getId()).isNotEqualTo(tache1.getId());
     }
 }

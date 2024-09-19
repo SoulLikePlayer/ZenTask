@@ -1,5 +1,7 @@
 package info.prog.zentask.controller;
 
+import info.prog.zentask.controller.Service.*;
+
 import info.prog.zentask.model.Projet;
 import info.prog.zentask.model.Status;
 import info.prog.zentask.model.Tache;
@@ -13,10 +15,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
-/**
- * Le controller MainController permet l'utilisation d'une base de données locale pour afficher les différentes tâches et projets.
- */
 public class MainController {
+
     @FXML
     private TableView<Tache> tasksTable;
     @FXML
@@ -53,9 +53,22 @@ public class MainController {
     private ObservableList<Tache> tacheList = FXCollections.observableArrayList();
     private ObservableList<Projet> projectList = FXCollections.observableArrayList();
 
+    private TaskService taskService;
+    private ProjectService projectService;
+
     @FXML
     public void initialize() {
-        // Initialisation des colonnes du TableView
+        taskService = new TaskService();
+        projectService = new ProjectService();
+
+        setupTableView();
+        loadTasks();
+        loadProjects();
+
+        setupEventHandlers();
+    }
+
+    private void setupTableView() {
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         priorityColumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
@@ -63,21 +76,7 @@ public class MainController {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         projectNameColumn.setCellValueFactory(new PropertyValueFactory<>("project"));
 
-        loadTasks(); // Charger les tâches depuis la base de données
-        loadProjects(); // Charger les projets depuis la base de données
-
-        // Désactiver les boutons "Terminer" et "Supprimer" par défaut
-        completeButton.setDisable(true);
-        deleteButton.setDisable(true);
-
-        // Désactiver les boutons si aucune tâche n'est sélectionnée
-        tasksTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            boolean selected = newSelection != null;
-            deleteButton.setDisable(!selected);
-            completeButton.setDisable(!selected);
-        });
-
-        // Appliquer un style différent aux lignes selon le statut de la tâche
+        tasksTable.setItems(tacheList);
         tasksTable.setRowFactory(tv -> new TableRow<Tache>() {
             @Override
             protected void updateItem(Tache tache, boolean empty) {
@@ -95,26 +94,12 @@ public class MainController {
         });
     }
 
+    private void loadTasks() {
+        tacheList.setAll(taskService.getAllTasks());
+    }
+
     private void loadProjects() {
-        projectList.clear();
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "SELECT * FROM projects";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String description = rs.getString("description");
-                Projet projet = new Projet(id, name, description, new ArrayList<>());
-                projectList.add(projet);
-            }
-        } catch (SQLException e) {
-            System.out.println("Erreur lors du chargement des projets : " + e.getMessage());
-        }
-
+        projectList.setAll(projectService.getAllProjects());
         projectComboBox.setItems(projectList);
     }
 
@@ -123,16 +108,11 @@ public class MainController {
         String title = titleField.getText();
         String description = descriptionField.getText();
         String priorityText = priorityField.getText().trim();
-        String deadline = null;
-        try {
-            deadline = deadlinePicker.getValue().toString();
-        } catch (Exception e) {
-            deadline = null;
-        }
+        String deadline = deadlinePicker.getValue() != null ? deadlinePicker.getValue().toString() : null;
         Status status = Status.EN_COURS;
         Projet selectedProject = projectComboBox.getValue();
 
-        if (title.isEmpty() || priorityText.isEmpty() || description.isEmpty()) {
+        if (title.isEmpty() || description.isEmpty() || priorityText.isEmpty()) {
             showAlert("Erreur", "Champs vides", "Veuillez remplir tous les champs.");
             return;
         }
@@ -146,7 +126,7 @@ public class MainController {
         }
 
         Tache newTache = new Tache(title, description, priority, deadline, status, selectedProject);
-        boolean addReussie = addTacheToDatabase(newTache);
+        boolean addReussie = taskService.addTask(newTache);
 
         if (addReussie) {
             showAlert("Succès", "Tâche ajoutée", "La tâche a été ajoutée avec succès.");
@@ -165,9 +145,9 @@ public class MainController {
             if (newProjectDescription == null) {
                 newProjectDescription = "";
             }
-            int newProjectId = getMaxProjectId() + 1;
+            int newProjectId = projectService.getMaxProjectId() + 1;
             Projet newProjet = new Projet(newProjectId, newProjectName, newProjectDescription, new ArrayList<>());
-            if (addProjectToDatabase(newProjet)) {
+            if (projectService.addProject(newProjet)) {
                 loadProjects();
             }
         }
@@ -178,8 +158,9 @@ public class MainController {
         Tache selectedTache = tasksTable.getSelectionModel().getSelectedItem();
         if (selectedTache != null) {
             selectedTache.setStatus(Status.TERMINÉ);
-            updateTacheStatus(selectedTache);
-            loadTasks();
+            if (taskService.updateTaskStatus(selectedTache)) {
+                loadTasks();
+            }
         }
     }
 
@@ -194,9 +175,9 @@ public class MainController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                if (deleteTacheFromDatabase(selectedTache)) {
+                if (taskService.deleteTask(selectedTache)) {
                     showAlert("Succès", "Tâche supprimée", "La tâche a été supprimée avec succès.");
-                    loadTasks(); // Recharger la liste des tâches après suppression
+                    loadTasks();
                 } else {
                     showAlert("Erreur", "Échec de la suppression", "Une erreur s'est produite lors de la suppression de la tâche.");
                 }
@@ -204,137 +185,12 @@ public class MainController {
         }
     }
 
-    private void loadTasks() {
-        tacheList.clear();
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "SELECT t.*, p.name AS projectName FROM tasks t LEFT JOIN projects p ON t.projectId = p.id";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String title = rs.getString("title");
-                String description = rs.getString("description");
-                int priority = rs.getInt("priority");
-                String deadline = rs.getString("deadline");
-                String statusStr = rs.getString("status");
-                Status status;
-                try {
-                    status = Status.valueOf(statusStr);
-                } catch (IllegalArgumentException e) {
-                    status = Status.ERREUR; // ou une autre valeur par défaut
-                }
-
-                String projectName = rs.getString("projectName");
-
-                // Rechercher le projet associé pour obtenir l'objet Projet
-                Projet project = projectList.stream()
-                        .filter(proj -> proj.getName().equals(projectName))
-                        .findFirst()
-                        .orElse(null);
-
-                Tache tache = new Tache(id, title, description, priority, deadline, status, project); // Assurez-vous d'avoir un constructeur approprié
-                tacheList.add(tache);
-            }
-        } catch (SQLException e) {
-            System.out.println("Erreur lors du chargement des tâches : " + e.getMessage());
-        }
-
-        tasksTable.setItems(tacheList);
-    }
-
-
-    private boolean addTacheToDatabase(Tache tache) {
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "INSERT INTO tasks(title, description, priority, deadline, status, projectId) " +
-                "VALUES(?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, tache.getTitle());
-            pstmt.setString(2, tache.getDescription());
-            pstmt.setInt(3, tache.getPriority());
-            pstmt.setString(4, tache.getDeadline());
-            pstmt.setString(5, tache.getStatus().name());
-            pstmt.setObject(6, tache.getProject() != null ? tache.getProject().getId() : null);
-
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout de la tâche : " + e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean addProjectToDatabase(Projet projet) {
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "INSERT INTO projects(id, name, description) VALUES(?, ?, ?)";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, projet.getId());
-            pstmt.setString(2, projet.getName());
-            pstmt.setString(3, projet.getDescription());
-
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout du projet : " + e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean updateTacheStatus(Tache tache) {
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "UPDATE tasks SET status = ? WHERE id = ?";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, tache.getStatus().name());
-            pstmt.setInt(2, tache.getId());
-
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la mise à jour de la tâche : " + e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean deleteTacheFromDatabase(Tache tache) {
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "DELETE FROM tasks WHERE id = ?";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, tache.getId());
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la suppression de la tâche : " + e.getMessage());
-            return false;
-        }
-    }
-
-    private int getMaxProjectId() {
-        String url = "jdbc:sqlite:src/main/resources/info/prog/zentask/database/gestionnaire.db";
-        String sql = "SELECT MAX(id) AS maxId FROM projects";
-        int maxId = 0;
-
-        try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            if (rs.next()) {
-                maxId = rs.getInt("maxId");
-            }
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la récupération de l'id maximum des projets : " + e.getMessage());
-        }
-
-        return maxId;
+    private void setupEventHandlers() {
+        tasksTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            boolean selected = newSelection != null;
+            deleteButton.setDisable(!selected);
+            completeButton.setDisable(!selected);
+        });
     }
 
     private void clearFields() {
